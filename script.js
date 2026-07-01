@@ -52,3 +52,108 @@ The project criteria focusing on ["${inputData.substring(0, 60)}..."] has been b
     outputDiv.classList.remove('hidden');
     startBtn.disabled = false;
 });
+// --- Interactive 3D Agent Swarm Canvas System ---
+const canvas = document.getElementById('swarmCanvas');
+const ctx = canvas.getContext('2d');
+const wrapper = document.getElementById('canvas-3d-wrapper');
+
+// Adjust canvas resolution dynamically
+function resizeCanvas() {
+    canvas.width = wrapper.clientWidth;
+    canvas.height = wrapper.clientHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const particles = [];
+const particleCount = 75;
+const mouse = { x: null, y: null, radius: 120 };
+
+// Track mouse position on the canvas
+wrapper.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+});
+
+wrapper.addEventListener('mouseleave', () => {
+    mouse.x = null;
+    mouse.y = null;
+});
+
+// Particle Node Structure
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 1.2;
+        this.vy = (Math.random() - 0.5) * 1.2;
+        this.radius = Math.random() * 2 + 1.5;
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Boundary bounce check
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+        // Mouse interaction pull effect
+        if (mouse.x !== null && mouse.y !== null) {
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < mouse.radius) {
+                this.x += dx * 0.03; 
+                this.y += dy * 0.03;
+            }
+        }
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#0070f3';
+        ctx.fill();
+    }
+}
+
+// Generate the initial agent network nodes
+for (let i = 0; i < particleCount; i++) {
+    particles.push(new Particle());
+}
+
+// Connect lines between close nodes
+function drawLines() {
+    for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+            let dx = particles[i].x - particles[j].x;
+            let dy = particles[i].y - particles[j].y;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 90) {
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = `rgba(0, 223, 216, ${1 - dist / 90})`;
+                ctx.lineWidth = 0.6;
+                ctx.stroke();
+            }
+        }
+    }
+}
+
+// System loop animation
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
+    
+    drawLines();
+    requestAnimationFrame(animate);
+}
+animate();

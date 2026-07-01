@@ -231,3 +231,26 @@ textarea:focus {
     max-height: 400px;
     overflow-y: auto;
 }
+.canvas-container-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#canvas-3d-wrapper {
+    width: 100%;
+    height: 300px;
+    background-color: #0d0d0d;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+#swarmCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
