@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Proposal Copilot | Powered by Kimi 2.6</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">ELCHAI GROUP <span class="accent">// OPENCLAW</span></div>
+            <div class="badge">Research Assessment Proposal</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="content-wrapper">
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Scale Enterprise Execution Without Losing Oversight</h1>
+            <p class="subtitle">Supercharge your OpenClaw ecosystem with a Kimi 2.6 swarm engine. Orchestrate 300 autonomous sub-agents across 4,000 coordinated steps to generate premium business proposals in minutes instead of days.</p>
+            <div class="cta-group">
+                <a href="#demo" class="btn btn-primary">Try Live PoC Demo</a>
+                <a href="https://www.elchaigroup.com/" target="_blank" class="btn btn-secondary">Visit Elchai Group</a>
+            </div>
+        </section>
+
+        <!-- Dynamic Live Interactive PoC App Component -->
+        <section id="demo" class="demo-card">
+            <div class="card-header">
+                <span class="status-dot"></span>
+                <h3>Interactive Proof of Concept (PoC)</h3>
+            </div>
+            <div class="card-body">
+                <label for="client-needs">Paste Client Project Requirements:</label>
+                <textarea id="client-needs" placeholder="Example: We need a secure, multi-tenant cloud infrastructure migration framework with strict regional compliance for a logistics company..."></textarea>
+                
+                <button id="generate-btn" class="btn btn-block">Execute Kimi 2.6 Multi-Agent Swarm</button>
+
+                <!-- Processing Simulator (Hidden by default) -->
+                <div id="swarm-status" class="hidden">
+                    <div class="spinner"></div>
+                    <div class="status-text-steps">
+                        <p id="step-msg">Initializing OpenClaw controller...</p>
+                        <span id="step-counter">0 / 4,000 steps executed</span>
+                    </div>
+                </div>
+
+                <!-- Output Area (Hidden by default) -->
+                <div id="output-proposal" class="hidden">
+                    <h4>Generated Enterprise Proposal Draft</h4>
+                    <div class="proposal-box" id="proposal-text"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
