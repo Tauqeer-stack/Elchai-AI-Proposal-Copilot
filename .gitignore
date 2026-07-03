@@ -1,3 +1,17 @@
+# Python environment and cache
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# --- Rest of your existing file starts here ---
+
 # Logs
 logs
 *.log
