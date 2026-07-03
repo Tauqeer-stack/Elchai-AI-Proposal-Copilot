@@ -1,0 +1,37 @@
+Project Log: The Birth of Q-Agentic Forge
+The Mission
+Building an autonomous, multi-agent proposal generation system using FastAPI, CrewAI, and OpenAI.
+
+Phase 1: Environment Setup & The Dependency Bottleneck
+Initial Setup: Initiated a Python virtual environment (venv) to isolate project dependencies.
+
+The Conflict: Encountered metadata-generation-failed and ResolutionImpossible errors.
+
+Root Cause: System default was Python 3.14, which created dependency conflicts with AI libraries (crewai and numpy) that require stable versions.
+
+The Solution:
+
+Identified that the system held multiple versions (3.14 and 3.10).
+
+Forced the use of Python 3.10 ("C:\Program Files\Python310\python.exe") to ensure compatibility with crewai and regex version requirements.
+
+Installed Microsoft Visual C++ Build Tools to allow the system to compile necessary math libraries (numpy).
+
+Finalized Configuration:
+
+Virtual Environment: Successfully activated using .\venv\Scripts\activate.
+
+Package Strategy: Installed core components (fastapi, uvicorn, openai) and crewai sequentially to avoid dependency resolution crashes.
+
+Phase 2: Architecture Strategy
+Pattern: API-driven Multi-Agent Orchestration.
+
+Tech Stack:
+
+Backend: FastAPI (Controller).
+
+Orchestration: CrewAI (Agent Swarm).
+
+Intelligence: OpenAI (LLM Provider).
+
+Founder’s Strategy: Implemented a "Pre-compiled Binary" strategy to keep the installation lean and stable, bypassing common Windows compilation pitfalls.

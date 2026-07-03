@@ -1,159 +1,229 @@
-document.getElementById('generate-btn').addEventListener('click', async () => {
-    const inputData = document.getElementById('client-needs').value.trim();
-    if (!inputData) {
-        alert("Please paste some baseline requirements first!");
-        return;
-    }
+/**
+ * Q-AGENTIC FORGE - NEURAL NETWORK VISUALIZATION
+ * Simulates autonomous AI agents forming consensus networks.
+ */
 
-    const startBtn = document.getElementById('generate-btn');
-    const statusDiv = document.getElementById('swarm-status');
-    const outputDiv = document.getElementById('output-proposal');
-    const stepMsg = document.getElementById('step-msg');
-    const stepCounter = document.getElementById('step-counter');
-    const proposalText = document.getElementById('proposal-text');
-
-    // Reset layout states
-    startBtn.disabled = true;
-    outputDiv.classList.add('hidden');
-    statusDiv.classList.remove('hidden');
-
-    // Simulated Swarm Pipeline Steps
-    const stages = [
-        { msg: "🤖 OpenClaw Spawning Controller Framework...", steps: "120 / 4,000 steps" },
-        { msg: "📋 Planner Agent: Deconstructing project scope criteria...", steps: "950 / 4,000 steps" },
-        { msg: "💰 Budget Agent: Running cost estimates via Kimi 2.6 architecture...", steps: "2,100 / 4,000 steps" },
-        { msg: "🔒 Risk Agent: Checking localized compliance guardrails...", steps: "3,450 / 4,000 steps" },
-        { msg: "✍️ Proposal Writer Agent: Formatting final technical deliverable...", steps: "4,000 / 4,000 steps" }
-    ];
-
-    for (let i = 0; i < stages.length; i++) {
-        stepMsg.innerText = stages[i].msg;
-        stepCounter.innerText = stages[i].steps;
-        await new Promise(resolve => setTimeout(resolve, 1200)); 
-    }
-
-    // Generate output template context dynamically
-    proposalText.innerHTML = `### EXECUTIVE PROPOSAL
-**Prepared For:** Enterprise Client Ecosystem
-**Engine Integration:** OpenClaw OS powered by Kimi 2.6 Swarm
-
-1. STRUCTURE OVERVIEW
-The project criteria focusing on ["${inputData.substring(0, 60)}..."] has been broken down by 300 active sub-agents running across a 12-hour horizon simulation.
-
-2. OPERATIONAL ARCHITECTURE
-- Deployment Strategy: Gated sovereign infrastructure within a private local enterprise VPC.
-- Model Layering: Multi-threaded execution pipelines minimizing token memory footprints.
-
-3. FINANCIAL & DEVELOPMENT TIMELINE
-- Automated Estimate: Complete implementation mapping within 14 standard working units.
-- Cost Efficiency: Optimized via Mixture-of-Experts (MoE) to save up to 85% compared to proprietary external solutions.`;
-
-    statusDiv.classList.add('hidden');
-    outputDiv.classList.remove('hidden');
-    startBtn.disabled = false;
-});
-// --- Interactive 3D Agent Swarm Canvas System ---
 const canvas = document.getElementById('swarmCanvas');
 const ctx = canvas.getContext('2d');
-const wrapper = document.getElementById('canvas-3d-wrapper');
 
-// Adjust canvas resolution dynamically
+// Canvas dimensions
+let width, height;
+let nodes = [];
+
+// Mouse interaction tracking
+const mouse = {
+    x: null,
+    y: null,
+    radius: 150 // Connection radius for the user's cursor
+};
+
+// Handle window resize dynamically
 function resizeCanvas() {
-    canvas.width = wrapper.clientWidth;
-    canvas.height = wrapper.clientHeight;
+    const wrapper = document.getElementById('canvas-3d-wrapper');
+    width = wrapper.clientWidth;
+    height = wrapper.clientHeight;
+    canvas.width = width;
+    canvas.height = height;
 }
-resizeCanvas();
+
 window.addEventListener('resize', resizeCanvas);
 
-const particles = [];
-const particleCount = 75;
-const mouse = { x: null, y: null, radius: 120 };
-
-// Track mouse position on the canvas
-wrapper.addEventListener('mousemove', (e) => {
+// Track mouse position
+canvas.addEventListener('mousemove', (event) => {
     const rect = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
+    mouse.x = event.clientX - rect.left;
+    mouse.y = event.clientY - rect.top;
 });
 
-wrapper.addEventListener('mouseleave', () => {
+canvas.addEventListener('mouseleave', () => {
     mouse.x = null;
     mouse.y = null;
 });
 
-// Particle Node Structure
-class Particle {
-    constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.vx = (Math.random() - 0.5) * 1.2;
-        this.vy = (Math.random() - 0.5) * 1.2;
-        this.radius = Math.random() * 2 + 1.5;
-    }
-
-    update() {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // Boundary bounce check
-        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-
-        // Mouse interaction pull effect
-        if (mouse.x !== null && mouse.y !== null) {
-            let dx = mouse.x - this.x;
-            let dy = mouse.y - this.y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < mouse.radius) {
-                this.x += dx * 0.03; 
-                this.y += dy * 0.03;
-            }
-        }
+// AI Agent Node Class
+class AgentNode {
+    constructor(x, y, dx, dy, size) {
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+        this.size = size;
+        this.baseColor = '#38bdf8'; // Cyan
+        this.activeColor = '#8b5cf6'; // Purple
     }
 
     draw() {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#0070f3';
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.baseColor;
         ctx.fill();
+    }
+
+    update() {
+        // Bounce off walls
+        if (this.x > width || this.x < 0) this.dx = -this.dx;
+        if (this.y > height || this.y < 0) this.dy = -this.dy;
+
+        // Move node
+        this.x += this.dx;
+        this.y += this.dy;
+
+        this.draw();
     }
 }
 
-// Generate the initial agent network nodes
-for (let i = 0; i < particleCount; i++) {
-    particles.push(new Particle());
+// Initialize the Network
+function initNetwork() {
+    nodes = [];
+    resizeCanvas();
+    
+    // Create 70 autonomous nodes
+    let numberOfNodes = (width * height) / 9000; 
+    if(numberOfNodes < 40) numberOfNodes = 40;
+    if(numberOfNodes > 100) numberOfNodes = 100;
+
+    for (let i = 0; i < numberOfNodes; i++) {
+        let size = Math.random() * 2 + 1;
+        let x = Math.random() * (width - size * 2) + size;
+        let y = Math.random() * (height - size * 2) + size;
+        let dx = (Math.random() - 0.5) * 1.5; // Velocity X
+        let dy = (Math.random() - 0.5) * 1.5; // Velocity Y
+        
+        nodes.push(new AgentNode(x, y, dx, dy, size));
+    }
 }
 
-// Connect lines between close nodes
-function drawLines() {
-    for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-            let dx = particles[i].x - particles[j].x;
-            let dy = particles[i].y - particles[j].y;
-            let dist = Math.sqrt(dx * dx + dy * dy);
+// Connect the Nodes (Draw Synapses)
+function connectNodes() {
+    let opacityValue = 1;
+    for (let a = 0; a < nodes.length; a++) {
+        for (let b = a; b < nodes.length; b++) {
+            // Calculate distance between two nodes
+            let dx = nodes[a].x - nodes[b].x;
+            let dy = nodes[a].y - nodes[b].y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < 90) {
+            // Connect nodes if they are close
+            if (distance < 100) {
+                opacityValue = 1 - (distance / 100);
+                ctx.strokeStyle = `rgba(56, 189, 248, ${opacityValue * 0.3})`;
+                ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.strokeStyle = `rgba(0, 223, 216, ${1 - dist / 90})`;
-                ctx.lineWidth = 0.6;
+                ctx.moveTo(nodes[a].x, nodes[a].y);
+                ctx.lineTo(nodes[b].x, nodes[b].y);
+                ctx.stroke();
+            }
+        }
+
+        // Connect node to mouse cursor to simulate user input mapping
+        if (mouse.x != null && mouse.y != null) {
+            let dxMouse = nodes[a].x - mouse.x;
+            let dyMouse = nodes[a].y - mouse.y;
+            let distanceMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+
+            if (distanceMouse < mouse.radius) {
+                ctx.strokeStyle = `rgba(139, 92, 246, ${1 - distanceMouse/mouse.radius})`; // Purple user connection
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(nodes[a].x, nodes[a].y);
+                ctx.lineTo(mouse.x, mouse.y);
                 ctx.stroke();
             }
         }
     }
 }
 
-// System loop animation
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    particles.forEach(p => {
-        p.update();
-        p.draw();
-    });
-    
-    drawLines();
-    requestAnimationFrame(animate);
+// Animation Loop
+function animateNetwork() {
+    requestAnimationFrame(animateNetwork);
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < nodes.length; i++) {
+        nodes[i].update();
+    }
+    connectNodes();
 }
-animate();
+
+// Start Engine
+initNetwork();
+animateNetwork();
+
+/**
+ * UI INTERACTION LOGIC (The PoC Demo Button)
+ */
+const generateBtn = document.getElementById('generate-btn');
+const swarmStatus = document.getElementById('swarm-status');
+const outputProposal = document.getElementById('output-proposal');
+const proposalText = document.getElementById('proposal-text');
+const stepMsg = document.getElementById('step-msg');
+
+generateBtn.addEventListener('click', () => {
+    const clientNeeds = document.getElementById('client-needs').value;
+    if(!clientNeeds) return alert("Please input client requirements first.");
+
+    generateBtn.classList.add('hidden');
+    swarmStatus.classList.remove('hidden');
+    outputProposal.classList.add('hidden');
+
+    // Simulate Agent Swarm Processing
+    setTimeout(() => { stepMsg.innerText = "Deploying Q-Agentic Architecture..."; }, 1000);
+    setTimeout(() => { stepMsg.innerText = "Synthesizing compliance frameworks..."; }, 2500);
+    setTimeout(() => { stepMsg.innerText = "Generating enterprise proposal draft..."; }, 4000);
+
+    setTimeout(() => {
+        swarmStatus.classList.add('hidden');
+        outputProposal.classList.remove('hidden');
+        generateBtn.classList.remove('hidden');
+        generateBtn.innerText = "Regenerate Proposal";
+        
+        proposalText.innerHTML = `
+            <strong>Executive Summary:</strong> Based on the provided parameters, Q-Agentic Forge has structured a multi-tenant cloud migration protocol.<br><br>
+            <strong>Execution Timeline:</strong> 14 Days to phase-one completion.<br>
+            <strong>Security Protocol:</strong> Tier-4 Regional Compliance standard applied.<br><br>
+            <em>[System Note: This is a v1.0 local prototype output. Full agent swarm connection required for complete document generation.]</em>
+        `;
+    }, 5500);
+});
+/**
+ * ROI CALCULATOR ENGINE
+ * Assumes Q-Agentic Forge reduces proposal creation time by 90%
+ */
+const propSlider = document.getElementById('prop-slider');
+const hoursSlider = document.getElementById('hours-slider');
+const rateSlider = document.getElementById('rate-slider');
+
+const propVal = document.getElementById('prop-val');
+const hoursVal = document.getElementById('hours-val');
+const rateVal = document.getElementById('rate-val');
+
+const timeSavedEl = document.getElementById('time-saved');
+const moneySavedEl = document.getElementById('money-saved');
+
+function calculateROI() {
+    // Get values from sliders
+    const props = parseInt(propSlider.value);
+    const hours = parseInt(hoursSlider.value);
+    const rate = parseInt(rateSlider.value);
+
+    // Update text labels above sliders
+    propVal.innerText = props;
+    hoursVal.innerText = hours;
+    rateVal.innerText = rate;
+
+    // The Algorithm: Calculate total hours currently spent, then take 90% as "saved"
+    const currentTotalHours = props * hours;
+    const hoursSaved = Math.floor(currentTotalHours * 0.9);
+    const capitalSaved = hoursSaved * rate;
+
+    // Inject into the UI with formatting
+    timeSavedEl.innerText = hoursSaved.toLocaleString() + " hrs";
+    moneySavedEl.innerText = "$" + capitalSaved.toLocaleString();
+}
+
+// Listen for slider movement
+[propSlider, hoursSlider, rateSlider].forEach(slider => {
+    slider.addEventListener('input', calculateROI);
+});
+
+// Run once on load to establish baseline numbers
+calculateROI();
